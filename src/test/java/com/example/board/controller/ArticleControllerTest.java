@@ -1,25 +1,41 @@
 package com.example.board.controller;
 
+import com.example.board.config.SecurityConfig;
+import com.example.board.dto.ArticleWithCommentsDto;
+import com.example.board.dto.UserAccountDto;
+import com.example.board.service.ArticleService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Disabled
+@Import(SecurityConfig.class)
 @DisplayName("view 컨트롤러")
 @WebMvcTest(ArticleController.class)
 class ArticleControllerTest {
 
     private final MockMvc mvc;
+
+    @MockBean private ArticleService articleService;
 
     public ArticleControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
@@ -28,7 +44,7 @@ class ArticleControllerTest {
     @Test
     void listTest() throws Exception {
         //given
-
+        given(articleService.searchArticles(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
         //when
         mvc.perform(get("/articles"))
                 .andExpect(status().isOk())
@@ -36,12 +52,14 @@ class ArticleControllerTest {
                 .andExpect(view().name("articles/index"))
                 .andExpect(model().attributeExists("articles"));
         //then
+        then(articleService).should().searchArticles(eq(null), eq(null), any(Pageable.class));
     }
     @DisplayName("[view][GET] 게시글 상세")
     @Test
     void detailTest() throws Exception {
         //given
-
+        Long articleId=1L;
+        given(articleService.getArticle(articleId)).willReturn(createArticleWithCommentsDto());
         //when
         mvc.perform(get("/articles/1"))
                 .andExpect(status().isOk())
@@ -50,12 +68,12 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"));
         //then
+        then(articleService).should().getArticle(articleId);
     }
     @DisplayName("[view][GET] 게시글 검색 전용 페이지")
     @Test
     void searchTest() throws Exception {
         //given
-
         //when
         mvc.perform(get("/articles/search"))
                 .andExpect(status().isOk())
@@ -72,6 +90,35 @@ class ArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
         //then
+    }
+
+    private ArticleWithCommentsDto createArticleWithCommentsDto() {
+        return ArticleWithCommentsDto.of(
+                1L,
+                createUserAccountDto(),
+                Set.of(),
+                "title",
+                "content",
+                "#java",
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(1L,
+                "uno",
+                "pw",
+                "uno@mail.com",
+                "Uno",
+                "memo",
+                LocalDateTime.now(),
+                "uno",
+                LocalDateTime.now(),
+                "uno"
+        );
     }
 
 }
