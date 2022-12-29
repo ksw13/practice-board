@@ -176,7 +176,7 @@ class ArticleServiceTest {
         assertThat(actual).isEqualTo(expected);
         then(articleRepository).should().count();
     }
-    
+
     private UserAccount createUserAccount() {
         return UserAccount.of(
                 "uno",
