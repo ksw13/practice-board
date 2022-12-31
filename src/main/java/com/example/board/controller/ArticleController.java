@@ -4,6 +4,7 @@ import com.example.board.domain.constant.FormStatus;
 import com.example.board.domain.constant.SearchType;
 import com.example.board.dto.UserAccountDto;
 import com.example.board.dto.request.ArticleRequest;
+import com.example.board.dto.security.BoardPrincipal;
 import com.example.board.response.ArticleResponse;
 import com.example.board.response.ArticleWithCommentsResponse;
 import com.example.board.service.ArticleService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -110,9 +112,12 @@ public class ArticleController {
     }
 
     @PostMapping("/{articleId}/delete")
-    public String deleteArticle(@PathVariable Long articleId) {
+    public String deleteArticle(
+            @PathVariable Long articleId,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal
+            ) {
         // TODO: 인증 정보를 넣어줘야 한다.
-        articleService.deleteArticle(articleId);
+        articleService.deleteArticle(articleId, boardPrincipal.getUsername());
 
         return "redirect:/articles";
     }
