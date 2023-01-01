@@ -32,9 +32,9 @@ spring:
   config.activate.on-profile: prod
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://{DB_HOST}:{DB_PORT}/board?characterEncoding=UTF-8&serverTimezone=UTC
-    username: {DB_USERNAME}
-    password: {DB_PASSWORD}
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/board?characterEncoding=UTF-8&serverTimezone=UTC
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     open-in-view: false
     show-sql: true
@@ -48,4 +48,3 @@ spring:
   data.rest:
     base-path: /api
     detection-strategy: annotated
-
