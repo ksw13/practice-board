@@ -14,10 +14,9 @@ spring:
 spring:
   config.activate.on-profile: local
   datasource:
-    url: jdbc:mysql://localhost:3306/board
+    url: jdbc:postgresql://localhost:5432/board
     username: swkang
     password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     defer-datasource-initialization: true
     hibernate.ddl-auto: create
